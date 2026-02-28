@@ -1,11 +1,10 @@
 #include "chyokotov_a_dense_matrix_mul_foxs_algorithm/seq/include/ops_seq.hpp"
 
+#include <algorithm>
 #include <cmath>
-#include <numeric>
 #include <vector>
 
 #include "chyokotov_a_dense_matrix_mul_foxs_algorithm/common/include/common.hpp"
-#include "util/include/util.hpp"
 
 namespace chyokotov_a_dense_matrix_mul_foxs_algorithm {
 
@@ -16,10 +15,7 @@ ChyokotovADenseMatMulFoxAlgorithmSEQ::ChyokotovADenseMatMulFoxAlgorithmSEQ(const
 }
 
 bool ChyokotovADenseMatMulFoxAlgorithmSEQ::ValidationImpl() {
-  if (GetInput().first.size() != GetInput().second.size()) {
-    return false;
-  }
-  return true;
+  return (GetInput().first.size() == GetInput().second.size());
 }
 
 bool ChyokotovADenseMatMulFoxAlgorithmSEQ::PreProcessingImpl() {
@@ -28,11 +24,11 @@ bool ChyokotovADenseMatMulFoxAlgorithmSEQ::PreProcessingImpl() {
   return true;
 }
 
-int ChyokotovADenseMatMulFoxAlgorithmSEQ::CalculateBlockSize(int n) {
+static int ChyokotovADenseMatMulFoxAlgorithmSEQ::CalculateBlockSize(int n) {
   return static_cast<int>(std::sqrt(static_cast<double>(n)));
 }
 
-int ChyokotovADenseMatMulFoxAlgorithmSEQ::CountBlock(int n, int size) {
+static int ChyokotovADenseMatMulFoxAlgorithmSEQ::CountBlock(int n, int size) {
   return (n + size - 1) / size;
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "chyokotov_a_dense_matrix_mul_foxs_algorithm/common/include/common.hpp"
 #include "task/include/task.hpp"
 

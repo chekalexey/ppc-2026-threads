@@ -1,11 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
-#include <cstdint>
-#include <numeric>
-#include <stdexcept>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -58,8 +55,8 @@ class ChyokotovARunFuncTestsThreads : public ppc::util::BaseRunFuncTests<InType,
   }
 
  private:
-  InType input_data_{};
-  OutType expected_output_{};
+  InType input_data_;
+  OutType expected_output_;
 };
 
 namespace {
@@ -68,23 +65,25 @@ TEST_P(ChyokotovARunFuncTestsThreads, MatrixMultiplicate) {
   ExecuteTest(GetParam());
 }
 
-const std::vector<double> emptymatrix = {};
-const std::vector<double> matrixa1x1 = {1.0};
-const std::vector<double> matrixb1x1 = {2.0};
-const std::vector<double> matrixc1x1 = {2.0};
+const std::vector<double> kEmptymatrix = {};
+const std::vector<double> kMatrixa1x1 = {1.0};
+const std::vector<double> kMatrixb1x1 = {2.0};
+const std::vector<double> kMatrixc1x1 = {2.0};
 
-const std::vector<double> matrixa2x2 = {1.0, 2.0, 1.5, 2.5};
-const std::vector<double> matrixb2x2 = {2.0, 4.0, 1.5, 3.5};
-const std::vector<double> matrixc2x2 = {5.0, 11.0, 6.75, 14.75};
+const std::vector<double> kMatrixa2x2 = {1.0, 2.0, 1.5, 2.5};
+const std::vector<double> kMatrixb2x2 = {2.0, 4.0, 1.5, 3.5};
+const std::vector<double> kMatrixc2x2 = {5.0, 11.0, 6.75, 14.75};
 
-const std::vector<double> matrixa4x4 = {1.0, 2.0, 3.0, 4.0, 4.0, 3.0, 2.0, 1.0, 5.0, 6.0, 7.0, 8.0, 8.0, 7.0, 6.0, 5.0};
-const std::vector<double> matrixb4x4 = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+const std::vector<double> kMatrixa4x4 = {1.0, 2.0, 3.0, 4.0, 4.0, 3.0, 2.0, 1.0,
+                                         5.0, 6.0, 7.0, 8.0, 8.0, 7.0, 6.0, 5.0};
+const std::vector<double> kMatrixb4x4 = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                                         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
 
 const std::array<TestType, 4> kTestParam = {
-    std::make_tuple(std::make_pair(emptymatrix, emptymatrix), emptymatrix),
-    std::make_tuple(std::make_pair(matrixa1x1, matrixb1x1), matrixc1x1),
-    std::make_tuple(std::make_pair(matrixa2x2, matrixb2x2), matrixc2x2),
-    std::make_tuple(std::make_pair(matrixa4x4, matrixb4x4), matrixa4x4),
+    std::make_tuple(std::make_pair(kEmptymatrix, kEmptymatrix), kEmptymatrix),
+    std::make_tuple(std::make_pair(kMatrixa1x1, kMatrixb1x1), kMatrixc1x1),
+    std::make_tuple(std::make_pair(kMatrixa2x2, kMatrixb2x2), kMatrixc2x2),
+    std::make_tuple(std::make_pair(kMatrixa4x4, kMatrixb4x4), kMatrixa4x4),
 };
 
 const auto kTestTasksList = std::tuple_cat(
