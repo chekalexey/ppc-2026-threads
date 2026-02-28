@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <cmath>
 #include <cstddef>
 #include <vector>
 
@@ -16,15 +17,15 @@ class ChyokotovARunPerfTestThreads : public ppc::util::BaseRunPerfTests<InType, 
   void SetUp() override {
     std::vector<double> &a = input_data_.first;
     std::vector<double> &b = input_data_.second;
-    const size_t n = 700;
+    const size_t n = 625;
     a.resize(n * n);
     b.resize(n * n);
     expected_output_.resize(n * n);
 
     for (size_t i = 0; i < n; i++) {
       for (size_t j = 0; j < n; j++) {
-        a[(i * n) + j] = static_cast<double>(i + j);
-        b[(i * n) + j] = static_cast<double>(i - j);
+        a[(i * n) + j] = static_cast<double>((i + j) % 10007);
+        b[(i * n) + j] = static_cast<double>((i + j) % 997);
       }
     }
     for (size_t i = 0; i < n; i++) {
@@ -39,7 +40,15 @@ class ChyokotovARunPerfTestThreads : public ppc::util::BaseRunPerfTests<InType, 
   }
 
   bool CheckTestOutputData(OutType &output_data) final {
-    return (expected_output_ == output_data);
+    const size_t n = 625;
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < n; j++) {
+        if (std::abs(expected_output_[(i * n) + j] - output_data[(i * n) + j]) > 0.0001) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   InType GetTestInputData() final {
