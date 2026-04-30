@@ -2,7 +2,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include "chyokotov_a_dense_matrix_mul_foxs_algorithm/common/include/common.hpp"
@@ -33,6 +35,16 @@ int ChyokotovADenseMatMulFoxAlgorithmSTL::CountBlock(int n, int size) {
   return (n + size - 1) / size;
 }
 
+std::vector<std::pair<int, int>> ChyokotovADenseMatMulFoxAlgorithmSTL::Blocks(int count_block) {
+  std::vector<std::pair<int, int>> blocks;
+  for (int ic = 0; ic < count_block; ic++) {
+    for (int jc = 0; jc < count_block; jc++) {
+      blocks.emplace_back(ic, jc);
+    }
+  }
+  return blocks;
+}
+
 void ChyokotovADenseMatMulFoxAlgorithmSTL::Matmul(std::vector<double> &a, std::vector<double> &b, int n, int istart,
                                                   int iend, int jstart, int jend, int kstart, int kend) {
   for (int i = istart; i < iend; i++) {
@@ -56,33 +68,29 @@ bool ChyokotovADenseMatMulFoxAlgorithmSTL::RunImpl() {
 
   int block_size = CalculateBlockSize(n);
   int count_block = CountBlock(n, block_size);
+  std::vector<std::pair<int, int>> blocks = Blocks(count_block);
 
-  std::vector<std::pair<int, int>> blocks;
-  for (int ic = 0; ic < count_block; ic++) {
-    for (int jc = 0; jc < count_block; jc++) {
-      blocks.emplace_back(ic, jc);
-    }
+  auto num_threads = static_cast<size_t>(ppc::util::GetNumThreads());
+  if (num_threads == 0) {
+    num_threads = 4;
   }
-  
-  size_t num_threads = static_cast<size_t>(ppc::util::GetNumThreads());
-  if (num_threads == 0) num_threads = 4;
-  
+
   std::vector<std::thread> threads;
   size_t blocks_per_thread = blocks.size() / num_threads;
 
-  for (size_t t = 0; t < num_threads; ++t) {
-    size_t start_idx = t * blocks_per_thread;
-    size_t end_idx = (t == num_threads - 1) ? blocks.size() : start_idx + blocks_per_thread;
-    
+  for (size_t tt = 0; tt < num_threads; ++tt) {
+    size_t start_idx = tt * blocks_per_thread;
+    size_t end_idx = (tt == num_threads - 1) ? blocks.size() : start_idx + blocks_per_thread;
+
     threads.emplace_back([&, start_idx, end_idx]() {
       for (size_t idx = start_idx; idx < end_idx; ++idx) {
         auto [ic, jc] = blocks[idx];
-        
+
         int istart = ic * block_size;
         int jstart = jc * block_size;
         int iend = std::min(istart + block_size, n);
         int jend = std::min(jstart + block_size, n);
-        
+
         for (int kc = 0; kc < count_block; kc++) {
           int kstart = kc * block_size;
           int kend = std::min(kstart + block_size, n);
@@ -92,7 +100,7 @@ bool ChyokotovADenseMatMulFoxAlgorithmSTL::RunImpl() {
     });
   }
 
-  for (auto& thread : threads) {
+  for (auto &thread : threads) {
     thread.join();
   }
 

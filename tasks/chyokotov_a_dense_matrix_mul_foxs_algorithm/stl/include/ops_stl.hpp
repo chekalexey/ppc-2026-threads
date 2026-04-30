@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "chyokotov_a_dense_matrix_mul_foxs_algorithm/common/include/common.hpp"
@@ -22,6 +23,7 @@ class ChyokotovADenseMatMulFoxAlgorithmSTL : public BaseTask {
 
   static int CalculateBlockSize(int n);
   static int CountBlock(int n, int size);
+  std::vector<std::pair<int, int>> Blocks(int count_block);
   void Matmul(std::vector<double> &a, std::vector<double> &b, int n, int istart, int iend, int jstart, int jend,
               int kstart, int kend);
 };
